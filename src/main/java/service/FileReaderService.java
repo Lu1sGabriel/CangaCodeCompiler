@@ -12,13 +12,13 @@ import java.util.regex.Pattern;
 
 public class FileReaderService {
     private static final Pattern TOKEN_PATTERN = Pattern.compile(
-            "(//.*)|" +                      // Comment
-                    "(\"[^\"]*\")|" +               // Valid string
-                    "('[^']')|" +                   // Valid char
-                    "('[^']+')|" +                  // Invalid char
+            "(//.*)|" +                       // Comment
+                    "(\"[^\"]*\")|" +                // Valid string
+                    "('[^']')|" +                    // Valid char
+                    "('[^']+')|" +                   // Invalid char (ignored)
                     "([a-zA-Z_][a-zA-Z0-9_]*)|" +   // Identifier
                     "([0-9]+)|" +                   // Number
-                    "([=+\\-*/<>!;:,(){}\\[\\]])|" +// Valid operators
+                    "([=+\\-*/<>!;:,(){}\\[\\]])|" +// Operators
                     "(\\S+)"                        // Anything else (invalid)
     );
 
@@ -32,15 +32,14 @@ public class FileReaderService {
             while ((line = br.readLine()) != null) {
                 lineNumber++;
                 List<String> validTokens = new ArrayList<>();
-                List<String> invalidTokens = new ArrayList<>();
 
                 Matcher matcher = TOKEN_PATTERN.matcher(line);
 
                 while (matcher.find()) {
                     String token = matcher.group();
 
+                    // Ignore comments and everything after
                     if (token.startsWith("//")) {
-                        validTokens.add(token);
                         break;
                     }
 
@@ -48,25 +47,18 @@ public class FileReaderService {
                         validTokens.add(token); // valid string
                     } else if (token.matches("'[^']'")) {
                         validTokens.add(token); // valid char
-                    } else if (token.matches("'[^']+'")) {
-                        invalidTokens.add(token); // invalid char
                     } else if (token.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
                         validTokens.add(token); // identifier
                     } else if (token.matches("[0-9]+")) {
                         validTokens.add(token); // number
                     } else if (token.matches("[=+\\-*/<>!;:,(){}\\[\\]]")) {
                         validTokens.add(token); // operator
-                    } else {
-                        invalidTokens.add(token);
                     }
+                    // else ignora token inválido silenciosamente
                 }
 
                 if (!validTokens.isEmpty()) {
                     tokensByLine.put(lineNumber, validTokens);
-                }
-
-                if (!invalidTokens.isEmpty()) {
-                    System.out.println("⚠️  Line " + lineNumber + " contains invalid tokens: " + invalidTokens);
                 }
             }
 
