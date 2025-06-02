@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum Token {
+public enum TokenPalavrasReservadas {
 
     // PRS - Palavras reservadas
     INTEGER("integer", "PRS01"),
@@ -33,39 +33,6 @@ public enum Token {
     BREAK("break", "PRS25"),
     PRINT("print", "PRS26"),
 
-    // SRS - Símbolos
-    PONTOVIRGULA(";", "SRS01"),
-    VIRGULA(",", "SRS02"),
-    DOISPONTOS(":", "SRS03"),
-    ATRIBUICAO(":=", "SRS04"),
-    INTERROGACAO("?", "SRS05"),
-    PARENTESESABRIR("(", "SRS06"),
-    PARENTESESFECHAR(")", "SRS07"),
-    COLCHETEABRIR("[", "SRS08"),
-    COLCHETEFECHAR("]", "SRS09"),
-    CHAVEABRIR("{", "SRS10"),
-    CHAVEFECHAR("}", "SRS11"),
-    MAIS("+", "SRS12"),
-    MENOS("-", "SRS13"),
-    MULTIPLICACAO("*", "SRS14"),
-    DIVISAO("/", "SRS15"),
-    RESTO("%", "SRS16"),
-    IGUAL("==", "SRS17"),
-    DIFERENTE1("!=", "SRS18"),
-    DIFERENTE2("#", "SRS18"),
-    MENOR("<", "SRS19"),
-    MENORIGUAL("<=", "SRS20"),
-    MAIOR(">", "SRS21"),
-    MAIORIGUAL(">=", "SRS22"),
-
-    // IDN - Identificadores
-    PROGRAMNAME("programName", "IDN01"),
-    VARIABLE("variable", "IDN02"),
-    FUNCTIONNAME("functionName", "IDN03"),
-    INTCONST("intConst", "IDN04"),
-    REALCONST("realConst", "IDN05"),
-    STRINGCONST("stringConst", "IDN06"),
-    CHARCONST("charConst", "IDN07"),
 
     // SUB - Submáquinas
     SUBMACHINE1("submachine1", "SUB01"),
@@ -76,7 +43,7 @@ public enum Token {
     private final String name;
     private final String code;
 
-    Token(String name, String code) {
+    TokenPalavrasReservadas(String name, String code) {
         this.name = name;
         this.code = code;
     }
@@ -89,20 +56,19 @@ public enum Token {
         return code;
     }
 
-    private static final Map<String, Token> TokenList = new HashMap<>();
+    private static final Map<String, TokenPalavrasReservadas> TokenList = new HashMap<>();
     static {
-        for (Token token : Token.values()) {
-            TokenList.put(token.name(), token);
+        for (TokenPalavrasReservadas token : TokenPalavrasReservadas.values()) {
+            TokenList.put(token.getName(), token);
         }
     }
 
-
-    public static Token getTokenbyName (String word) {
+    public static TokenPalavrasReservadas getTokenByName (String word) {
         if (word == null){
             return null;
         }
         return TokenList.get(word);
-        
+
     }
 
 
