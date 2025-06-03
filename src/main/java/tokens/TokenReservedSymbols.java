@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenSimbolosReservados {
+public enum TokenReservedSymbols {
 
     PONTOVIRGULA(";", "SRS01"),
     VIRGULA(",", "SRS02"),
@@ -33,7 +33,7 @@ public enum TokenSimbolosReservados {
     private final String name;
     private final String code;
 
-    TokenSimbolosReservados(String name, String code) {
+    TokenReservedSymbols(String name, String code) {
         this.name = name;
         this.code = code;
     }
@@ -46,15 +46,15 @@ public enum TokenSimbolosReservados {
         return code;
     }
 
-    private static final Map<String, TokenSimbolosReservados> TokenList = new HashMap<>();
+    private static final Map<String, TokenReservedSymbols> TokenList = new HashMap<>();
     static {
-        for (TokenSimbolosReservados token : TokenSimbolosReservados.values()) {
+        for (TokenReservedSymbols token : TokenReservedSymbols.values()) {
             TokenList.put(token.getName(), token);
         }
     }
 
 
-    public static TokenSimbolosReservados getTokenByName (String word) {
+    public static TokenReservedSymbols getTokenByName (String word) {
         if (word == null){
             return null;
         }
