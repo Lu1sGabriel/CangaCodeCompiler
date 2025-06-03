@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenSubMaquinas {
+public enum TokenSubMachines {
 
     // SUB - Submáquinas
     SUBMACHINE1("submachine1", "SUB01"),
@@ -14,7 +14,7 @@ public enum TokenSubMaquinas {
     private final String name;
     private final String code;
 
-    TokenSubMaquinas(String name, String code) {
+    TokenSubMachines(String name, String code) {
         this.name = name;
         this.code = code;
     }
@@ -27,14 +27,14 @@ public enum TokenSubMaquinas {
         return code;
     }
 
-    private static final Map<String, TokenSubMaquinas> TokenList = new HashMap<>();
+    private static final Map<String, TokenSubMachines> TokenList = new HashMap<>();
     static {
-        for (TokenSubMaquinas token : TokenSubMaquinas.values()) {
+        for (TokenSubMachines token : TokenSubMachines.values()) {
             TokenList.put(token.getName(), token);
         }
     }
 
-    public static TokenSubMaquinas getTokenByName (String word) {
+    public static TokenSubMachines getTokenByName (String word) {
         if (word == null){
             return null;
         }

@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenPalavrasReservadas {
+public enum TokenReserverdWords {
 
     // PRS - Palavras reservadas
     INTEGER("integer", "PRS01"),
@@ -43,7 +43,7 @@ public enum TokenPalavrasReservadas {
     private final String name;
     private final String code;
 
-    TokenPalavrasReservadas(String name, String code) {
+    TokenReserverdWords(String name, String code) {
         this.name = name;
         this.code = code;
     }
@@ -56,14 +56,14 @@ public enum TokenPalavrasReservadas {
         return code;
     }
 
-    private static final Map<String, TokenPalavrasReservadas> TokenList = new HashMap<>();
+    private static final Map<String, TokenReserverdWords> TokenList = new HashMap<>();
     static {
-        for (TokenPalavrasReservadas token : TokenPalavrasReservadas.values()) {
+        for (TokenReserverdWords token : TokenReserverdWords.values()) {
             TokenList.put(token.getName(), token);
         }
     }
 
-    public static TokenPalavrasReservadas getTokenByName (String word) {
+    public static TokenReserverdWords getTokenByName (String word) {
         if (word == null){
             return null;
         }
