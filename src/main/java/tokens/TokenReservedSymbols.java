@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenReservedSymbols {
+public enum TokenReservedSymbols implements Token{
 
     PONTOVIRGULA(";", "SRS01"),
     VIRGULA(",", "SRS02"),

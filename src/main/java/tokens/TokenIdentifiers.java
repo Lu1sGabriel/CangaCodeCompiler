@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenIdentifiers {
+public enum TokenIdentifiers implements Token {
     PROGRAMNAME("programName", "IDN01"),
     VARIABLE("variable", "IDN02"),
     FUNCTIONNAME("functionName", "IDN03"),
