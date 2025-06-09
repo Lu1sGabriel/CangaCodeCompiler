@@ -1,5 +1,6 @@
 package gui;
 
+import model.TokenModel;
 import service.FileReaderService;
 
 import javax.swing.*;
@@ -101,16 +102,21 @@ public class FileSenderApp extends JFrame {
                 return;
             }
 
-            Map<Integer, List<String>> validTokens = FileReaderService.processFile(selectedFile.getPath());
+            Map<Integer, List<TokenModel>> tokenMap = FileReaderService.processFile(selectedFile.getPath());
             textArea.setText("");
 
-            if (validTokens.isEmpty()) {
+            if (tokenMap.isEmpty()) {
                 textArea.append("No valid tokens found.\n");
             } else {
-                for (Map.Entry<Integer, List<String>> line : validTokens.entrySet()) {
-                    textArea.append("Line " + line.getKey() + ": " + line.getValue() + "\n");
+                for (Map.Entry<Integer, List<TokenModel>> entry : tokenMap.entrySet()) {
+                    textArea.append("Line " + entry.getKey() + ":\n");
+                    for (TokenModel token : entry.getValue()) {
+                        textArea.append("  → " + token + "\n");
+                    }
+                    textArea.append("\n");
                 }
             }
+
         });
     }
 
