@@ -1,5 +1,9 @@
 package service;
 
+import tokens.TokenIdentifiers;
+import tokens.TokenReserverdWords;
+import tokens.TokenReservedSymbols;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,10 +36,11 @@ public class FileReaderService {
             while ((line = br.readLine()) != null) {
                 lineNumber++;
                 List<String> validTokens = new ArrayList<>();
-
+                List<String> codeByLine = new ArrayList<>();
                 Matcher matcher = TOKEN_PATTERN.matcher(line);
 
                 while (matcher.find()) {
+
                     String token = matcher.group();
 
                     // Ignore comments and everything after
@@ -44,21 +49,33 @@ public class FileReaderService {
                     }
 
                     if (token.matches("\"[^\"]*\"")) {
-                        validTokens.add(token); // valid string
+                        validTokens.add(token);
+                        // valid string
                     } else if (token.matches("'[^']'")) {
-                        validTokens.add(token); // valid char
+                        validTokens.add(token);
+                        // valid char
                     } else if (token.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
-                        validTokens.add(token); // identifier
+                        validTokens.add(token);
+                        // identifier
                     } else if (token.matches("[0-9]+")) {
-                        validTokens.add(token); // number
-                    } else if (token.matches("[=+\\-*/<>!;:,(){}\\[\\]]")) {
-                        validTokens.add(token); // operator
+                        validTokens.add(token);
+                        // number
+                    } else if (token.matches("([=+\\-*/<>!;:,(){}\\[\\]])|")) {
+                        validTokens.add(token);
+
+                        // operadores simples
+                    }else if (token.matches("(:=|<=|>=|!=)|")){
+                        validTokens.add(token);
+
+
                     }
+
                     // else ignora token inválido silenciosamente
                 }
 
                 if (!validTokens.isEmpty()) {
                     tokensByLine.put(lineNumber, validTokens);
+                    tokensByLine.put(lineNumber, codeByLine);
                 }
             }
 

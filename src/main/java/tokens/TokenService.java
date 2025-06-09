@@ -22,18 +22,19 @@ public enum TokenService {
         }
     }
 
-    public static String getAtomName(String token) {
+    public static String getAtomByName(String token) {
+
         switch (identify(token)) {
             case PALAVRAS_RESERVADAS:
-                return TokenReserverdWords.getTokenByName(token).getName();
+                return TokenReserverdWords.getTokenByName(token).getCode();
             case SIMBOLOS_RESERVADOS:
-                return TokenReservedSymbols.getTokenByName(token).getName();
+                return TokenReservedSymbols.getTokenByName(token).getCode();
             case IDENTIFICADORES:
-                return TokenIdentifiers.getTokenByName(token).getName();
+                return TokenIdentifiers.getTokenByName(token).getCode();
             case SUB_MAQUINAS:
-                return TokenSubMachines.getTokenByName(token).getName();
+                return TokenSubMachines.getTokenByName(token).getCode();
             default:
-                return "NULO";
+                return null;
         }
     }
 

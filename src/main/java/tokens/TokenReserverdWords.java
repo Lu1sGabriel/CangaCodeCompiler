@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenReserverdWords {
+public enum TokenReserverdWords implements Token {
 
     // PRS - Palavras reservadas
     INTEGER("integer", "PRS01"),
@@ -31,14 +31,8 @@ public enum TokenReserverdWords {
     WHILE("while", "PRS23"),
     ENDWHILE("endWhile", "PRS24"),
     BREAK("break", "PRS25"),
-    PRINT("print", "PRS26"),
+    PRINT("print", "PRS26");
 
-
-    // SUB - Submáquinas
-    SUBMACHINE1("submachine1", "SUB01"),
-    SUBMACHINE2("submachine2", "SUB02"),
-    SUBMACHINE3("submachine3", "SUB03"),
-    SUBMACHINEN("submachinen", "SUBNN");
 
     private final String name;
     private final String code;
