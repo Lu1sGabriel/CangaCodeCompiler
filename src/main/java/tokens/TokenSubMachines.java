@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenSubMachines implements Token{
+public enum TokenSubMachines implements IToken {
 
     // SUB - Submáquinas
     SUBMACHINE1("submachine1", "SUB01"),

@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenReserverdWords implements Token {
+public enum TokenReserverdWords implements IToken {
 
     // PRS - Palavras reservadas
     INTEGER("integer", "PRS01"),

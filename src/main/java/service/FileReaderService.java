@@ -1,9 +1,5 @@
 package service;
 
-import tokens.TokenIdentifiers;
-import tokens.TokenReserverdWords;
-import tokens.TokenReservedSymbols;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -66,11 +62,8 @@ public class FileReaderService {
                         // operadores simples
                     }else if (token.matches("(:=|<=|>=|!=)|")){
                         validTokens.add(token);
-
-
                     }
 
-                    // else ignora token inválido silenciosamente
                 }
 
                 if (!validTokens.isEmpty()) {
@@ -85,4 +78,5 @@ public class FileReaderService {
 
         return tokensByLine;
     }
+
 }
