@@ -29,18 +29,18 @@ public enum TokenIdentifiers implements IToken {
     }
 
     private static final Map<String, TokenIdentifiers> TokenList = new HashMap<>();
+
     static {
         for (TokenIdentifiers token : TokenIdentifiers.values()) {
             TokenList.put(token.getName(), token);
         }
     }
 
-    public static TokenIdentifiers getTokenByName (String word) {
-        if (word == null){
+    public static TokenIdentifiers getTokenByName(String word) {
+        if (word == null) {
             return null;
         }
         return TokenList.get(word);
-
     }
 
 }

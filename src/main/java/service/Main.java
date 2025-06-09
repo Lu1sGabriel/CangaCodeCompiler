@@ -1,14 +1,27 @@
 package service;
 
-import tokens.TokenUtils;
+import model.TokenModel;
 import tokens.IToken;
+import tokens.TokenUtils;
 
 public class Main {
-    private final static StringBuilder STRING_BUILDER = new StringBuilder();
     public static void main(String[] args) {
-        IToken IToken = TokenUtils.findTokenByWord(":=");
-        STRING_BUILDER.append(IToken.getName());
-        STRING_BUILDER.append(IToken.getCode());
-        System.out.println(STRING_BUILDER);
+        testToken(":=");
+        testToken(";");
+        testToken(">=");
+        testToken("integer");
+        testToken("submachine1");
+        testToken("nonexistent");
     }
+
+    public static void testToken(String word) {
+        IToken token = TokenUtils.findTokenByWord(word);
+        if (token != null) {
+            TokenModel tokenModel = new TokenModel(token.getName(), token.getCode());
+            System.out.println("Entrada: \"" + word + "\" → " + tokenModel);
+        } else {
+            System.out.println("Entrada: \"" + word + "\" → Token não encontrado.");
+        }
+    }
+
 }

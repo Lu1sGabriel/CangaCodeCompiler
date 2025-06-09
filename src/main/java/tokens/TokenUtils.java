@@ -7,10 +7,13 @@ public class TokenUtils {
 
         IToken token;
 
-        token = TokenReservedSymbols.getTokenByName(word);
+        token = TokenIdentifiers.getTokenByName(word);
         if (token != null) return token;
 
-        token = TokenReserverdWords.getTokenByName(word);
+        token = TokenReservedWords.getTokenByName(word);
+        if (token != null) return token;
+
+        token = TokenReservedSymbols.getTokenByName(word);
         if (token != null) return token;
 
         token = TokenSubMachines.getTokenByName(word);

@@ -29,7 +29,6 @@ public enum TokenReservedSymbols implements IToken {
     MAIOR(">", "SRS21"),
     MAIORIGUAL(">=", "SRS22");
 
-
     private final String name;
     private final String code;
 
@@ -47,18 +46,18 @@ public enum TokenReservedSymbols implements IToken {
     }
 
     private static final Map<String, TokenReservedSymbols> TokenList = new HashMap<>();
+
     static {
         for (TokenReservedSymbols token : TokenReservedSymbols.values()) {
             TokenList.put(token.getName(), token);
         }
     }
 
-
-    public static TokenReservedSymbols getTokenByName (String word) {
-        if (word == null){
+    public static TokenReservedSymbols getTokenByName(String word) {
+        if (word == null) {
             return null;
         }
         return TokenList.get(word);
-
     }
+
 }
