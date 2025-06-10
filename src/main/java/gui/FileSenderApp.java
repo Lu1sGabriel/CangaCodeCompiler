@@ -71,29 +71,44 @@ public class FileSenderApp extends JFrame {
     }
 
     private JPanel createHeaderPanel() {
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createRaisedBevelBorder(),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
         headerPanel.setBackground(new Color(240, 248, 255));
 
+        // Left side - Team Information and Report Header
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBackground(new Color(240, 248, 255));
+
         // Team Information Section
         JPanel teamInfoPanel = createTeamInfoPanel();
-        headerPanel.add(teamInfoPanel);
+        leftPanel.add(teamInfoPanel);
 
-        headerPanel.add(Box.createVerticalStrut(10));
+        leftPanel.add(Box.createVerticalStrut(10));
 
         // Analysis Report Header
         JPanel reportHeaderPanel = createReportHeaderPanel();
-        headerPanel.add(reportHeaderPanel);
+        leftPanel.add(reportHeaderPanel);
 
-        headerPanel.add(Box.createVerticalStrut(10));
+        // Right side - File Selection Panel (Buttons)
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBackground(new Color(240, 248, 255));
 
-        // File Selection Panel
+        // Add some vertical space to center the buttons
+        rightPanel.add(Box.createVerticalGlue());
+
         JPanel fileSelectionPanel = createFileSelectionPanel();
-        headerPanel.add(fileSelectionPanel);
+        rightPanel.add(fileSelectionPanel);
+
+        rightPanel.add(Box.createVerticalGlue());
+
+        // Add panels to header
+        headerPanel.add(leftPanel, BorderLayout.CENTER);
+        headerPanel.add(rightPanel, BorderLayout.EAST);
 
         return headerPanel;
     }
@@ -125,7 +140,7 @@ public class FileSenderApp extends JFrame {
         panel.add(membersLabel);
 
         for (String member : TEAM_MEMBERS) {
-            JLabel memberLabel = new JLabel("   • " + member);
+            JLabel memberLabel = new JLabel("• " + member);
             memberLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
             memberLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             panel.add(memberLabel);
@@ -163,8 +178,16 @@ public class FileSenderApp extends JFrame {
     }
 
     private JPanel createFileSelectionPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(new Color(240, 248, 255));
+        panel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(),
+                "Ações",
+                TitledBorder.LEFT,
+                TitledBorder.TOP,
+                new Font("Segoe UI", Font.BOLD, 12)
+        ));
 
         JButton btnChooseFile = new JButton("Escolher Arquivo");
         JButton btnOpenExisting = new JButton("Abrir da Pasta '251'");
@@ -175,9 +198,27 @@ public class FileSenderApp extends JFrame {
         styleButton(btnOpenExisting, new Color(155, 89, 182));
         styleButton(btnAnalyzeFile, new Color(46, 204, 113));
 
+        // Set button alignment and size
+        btnChooseFile.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnOpenExisting.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnAnalyzeFile.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Make buttons same width
+        Dimension buttonSize = new Dimension(180, 35);
+        btnChooseFile.setPreferredSize(buttonSize);
+        btnChooseFile.setMaximumSize(buttonSize);
+        btnOpenExisting.setPreferredSize(buttonSize);
+        btnOpenExisting.setMaximumSize(buttonSize);
+        btnAnalyzeFile.setPreferredSize(buttonSize);
+        btnAnalyzeFile.setMaximumSize(buttonSize);
+
+        panel.add(Box.createVerticalStrut(5));
         panel.add(btnChooseFile);
+        panel.add(Box.createVerticalStrut(8));
         panel.add(btnOpenExisting);
+        panel.add(Box.createVerticalStrut(8));
         panel.add(btnAnalyzeFile);
+        panel.add(Box.createVerticalStrut(5));
 
         // Add action listeners
         setupButtonActions(btnChooseFile, btnOpenExisting, btnAnalyzeFile);
@@ -273,19 +314,19 @@ public class FileSenderApp extends JFrame {
 
     private void showWelcomeMessage() {
         textArea.setText("=".repeat(60) + "\n");
-        textArea.append("       MINI ANALISADOR LÉXICO - ARQUIVOS .251\n");
+        textArea.append("MINI ANALISADOR LÉXICO - ARQUIVOS .251\n");
         textArea.append("=".repeat(60) + "\n\n");
         textArea.append("Bem-vindo ao Mini Analisador Léxico!\n\n");
         textArea.append("INSTRUÇÕES:\n");
-        textArea.append("   1. Selecione um arquivo .251 usando os botões acima\n");
-        textArea.append("   2. Clique em 'Analisar Arquivo' para executar a análise léxica\n");
-        textArea.append("   3. Os tokens encontrados serão exibidos nesta área\n\n");
+        textArea.append("1. Selecione um arquivo .251 usando os botões acima\n");
+        textArea.append("2. Clique em 'Analisar Arquivo' para executar a análise léxica\n");
+        textArea.append("3. Os tokens encontrados serão exibidos nesta área\n\n");
         textArea.append("O analisador reconhece:\n");
-        textArea.append("   • Identificadores e palavras reservadas\n");
-        textArea.append("   • Números inteiros e reais\n");
-        textArea.append("   • Strings e caracteres\n");
-        textArea.append("   • Símbolos e operadores\n");
-        textArea.append("   • Comentários (ignorados)\n\n");
+        textArea.append("• Identificadores e palavras reservadas\n");
+        textArea.append("• Números inteiros e reais\n");
+        textArea.append("• Strings e caracteres\n");
+        textArea.append("• Símbolos e operadores\n");
+        textArea.append("• Comentários (ignorados)\n\n");
         textArea.append("Pronto para começar!\n");
     }
 
@@ -347,7 +388,7 @@ public class FileSenderApp extends JFrame {
 
     private void displayAnalysisResults(List<TokenModel> tokens, int totalLines) {
         textArea.append("=".repeat(80) + "\n");
-        textArea.append("                    RESULTADO DA ANÁLISE LÉXICA\n");
+        textArea.append("RESULTADO DA ANÁLISE LÉXICA\n");
         textArea.append("=".repeat(80) + "\n\n");
 
         textArea.append("Arquivo analisado: " + selectedFile.getName() + "\n");
@@ -365,10 +406,13 @@ public class FileSenderApp extends JFrame {
 
             int tokenCount = 1;
             for (TokenModel token : tokens) {
-                textArea.append(String.format("%3d. %-20s | %s\n",
+                textArea.append(String.format(
+                        "%3d. %-20s | %-40s | %-10s\n",
                         tokenCount++,
                         token.token().getName(),
-                        "\"" + token.lexeme() + "\""));
+                        "Lexema: \"" + token.lexeme() + "\"",
+                        "Code: \"" + token.token().getCode() + "\""
+                ));
             }
 
             textArea.append("-".repeat(50) + "\n");
