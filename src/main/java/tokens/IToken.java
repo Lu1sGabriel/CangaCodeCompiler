@@ -4,6 +4,4 @@ public interface IToken {
     String getName();
 
     String getCode();
-
-    TokenType getType();
 }

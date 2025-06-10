@@ -27,11 +27,6 @@ public enum TokenSubMachines implements IToken {
         return code;
     }
 
-    @Override
-    public TokenType getType() {
-        return TokenType.SUB_MACHINE;
-    }
-
     private static final Map<String, TokenSubMachines> TokenList = new HashMap<>();
 
     static {

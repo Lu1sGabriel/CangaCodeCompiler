@@ -30,11 +30,6 @@ public enum TokenIdentifiers implements IToken {
         return code;
     }
 
-    @Override
-    public TokenType getType() {
-        return TokenType.IDENTIFIER;
-    }
-
     private static final Map<String, TokenIdentifiers> TokenList = new HashMap<>();
 
     static {

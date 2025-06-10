@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum TokenReservedSymbols implements IToken {
-
     PONTOVIRGULA(";", "SRS01"),
     VIRGULA(",", "SRS02"),
     DOISPONTOS(":", "SRS03"),
@@ -45,11 +44,6 @@ public enum TokenReservedSymbols implements IToken {
     @Override
     public String getCode() {
         return code;
-    }
-
-    @Override
-    public TokenType getType() {
-        return TokenType.RESERVED_SYMBOL;
     }
 
     private static final Map<String, TokenReservedSymbols> TokenList = new HashMap<>();
