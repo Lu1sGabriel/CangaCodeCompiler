@@ -111,7 +111,7 @@ public class FileSenderApp extends JFrame {
         panel.setBackground(new Color(240, 248, 255));
 
         // Team Code
-        JLabel teamCodeLabel = new JLabel("🏷️ Código da Equipe: " + TEAM_CODE);
+        JLabel teamCodeLabel = new JLabel("Código da Equipe: " + TEAM_CODE);
         teamCodeLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
         teamCodeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(teamCodeLabel);
@@ -119,7 +119,7 @@ public class FileSenderApp extends JFrame {
         panel.add(Box.createVerticalStrut(8));
 
         // Team Members
-        JLabel membersLabel = new JLabel("👥 Componentes:");
+        JLabel membersLabel = new JLabel("Componentes:");
         membersLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         membersLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(membersLabel);
@@ -146,14 +146,14 @@ public class FileSenderApp extends JFrame {
         ));
         panel.setBackground(new Color(240, 248, 255));
 
-        selectedFileLabel = new JLabel("📄 Texto fonte analisado: Nenhum arquivo selecionado");
+        selectedFileLabel = new JLabel("Texto fonte analisado: Nenhum arquivo selecionado");
         selectedFileLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         selectedFileLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(selectedFileLabel);
 
         panel.add(Box.createVerticalStrut(5));
 
-        analysisStatusLabel = new JLabel("📊 Status: Aguardando seleção de arquivo");
+        analysisStatusLabel = new JLabel("Status: Aguardando seleção de arquivo");
         analysisStatusLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         analysisStatusLabel.setForeground(new Color(102, 102, 102));
         analysisStatusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -166,9 +166,9 @@ public class FileSenderApp extends JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.setBackground(new Color(240, 248, 255));
 
-        JButton btnChooseFile = new JButton("📁 Escolher Arquivo");
-        JButton btnOpenExisting = new JButton("📂 Abrir da Pasta '251'");
-        JButton btnAnalyzeFile = new JButton("🔍 Analisar Arquivo");
+        JButton btnChooseFile = new JButton("Escolher Arquivo");
+        JButton btnOpenExisting = new JButton("Abrir da Pasta '251'");
+        JButton btnAnalyzeFile = new JButton("Analisar Arquivo");
 
         // Style buttons
         styleButton(btnChooseFile, new Color(52, 152, 219));
@@ -266,8 +266,8 @@ public class FileSenderApp extends JFrame {
     }
 
     private void updateFileSelection() {
-        selectedFileLabel.setText("📄 Texto fonte analisado: " + selectedFile.getName());
-        analysisStatusLabel.setText("📊 Status: Arquivo selecionado - Pronto para análise");
+        selectedFileLabel.setText("Texto fonte analisado: " + selectedFile.getName());
+        analysisStatusLabel.setText("Status: Arquivo selecionado - Pronto para análise");
         analysisStatusLabel.setForeground(new Color(39, 174, 96));
     }
 
@@ -276,27 +276,27 @@ public class FileSenderApp extends JFrame {
         textArea.append("       MINI ANALISADOR LÉXICO - ARQUIVOS .251\n");
         textArea.append("=".repeat(60) + "\n\n");
         textArea.append("Bem-vindo ao Mini Analisador Léxico!\n\n");
-        textArea.append("📋 INSTRUÇÕES:\n");
+        textArea.append("INSTRUÇÕES:\n");
         textArea.append("   1. Selecione um arquivo .251 usando os botões acima\n");
         textArea.append("   2. Clique em 'Analisar Arquivo' para executar a análise léxica\n");
         textArea.append("   3. Os tokens encontrados serão exibidos nesta área\n\n");
-        textArea.append("⚡ O analisador reconhece:\n");
+        textArea.append("O analisador reconhece:\n");
         textArea.append("   • Identificadores e palavras reservadas\n");
         textArea.append("   • Números inteiros e reais\n");
         textArea.append("   • Strings e caracteres\n");
         textArea.append("   • Símbolos e operadores\n");
         textArea.append("   • Comentários (ignorados)\n\n");
-        textArea.append("🚀 Pronto para começar!\n");
+        textArea.append("Pronto para começar!\n");
     }
 
     private void showFileSelectedMessage() {
         textArea.setText("=".repeat(60) + "\n");
         textArea.append("       ARQUIVO SELECIONADO\n");
         textArea.append("=".repeat(60) + "\n\n");
-        textArea.append("📄 Arquivo: " + selectedFile.getName() + "\n");
-        textArea.append("📂 Caminho: " + selectedFile.getAbsolutePath() + "\n\n");
-        textArea.append("✅ Arquivo carregado com sucesso!\n");
-        textArea.append("🔍 Clique em 'Analisar Arquivo' para executar a análise léxica.\n");
+        textArea.append("Arquivo: " + selectedFile.getName() + "\n");
+        textArea.append("Caminho: " + selectedFile.getAbsolutePath() + "\n\n");
+        textArea.append("Arquivo carregado com sucesso!\n");
+        textArea.append("Clique em 'Analisar Arquivo' para executar a análise léxica.\n");
     }
 
     private void performLexicalAnalysis() {
@@ -308,7 +308,7 @@ public class FileSenderApp extends JFrame {
             return;
         }
 
-        analysisStatusLabel.setText("📊 Status: Analisando arquivo...");
+        analysisStatusLabel.setText("Status: Analisando arquivo...");
         analysisStatusLabel.setForeground(new Color(243, 156, 18));
 
         try {
@@ -318,8 +318,8 @@ public class FileSenderApp extends JFrame {
             textArea.setText("");
 
             if (lines.isEmpty()) {
-                textArea.append("❌ Nenhuma linha válida encontrada no arquivo.\n");
-                analysisStatusLabel.setText("📊 Status: Erro - Arquivo vazio ou inválido");
+                textArea.append("Nenhuma linha válida encontrada no arquivo.\n");
+                analysisStatusLabel.setText("Status: Erro - Arquivo vazio ou inválido");
                 analysisStatusLabel.setForeground(new Color(231, 76, 60));
                 return;
             }
@@ -339,8 +339,8 @@ public class FileSenderApp extends JFrame {
             displayAnalysisResults(tokens, lines.size());
 
         } catch (Exception ex) {
-            textArea.setText("❌ ERRO durante a análise:\n\n" + ex.getMessage());
-            analysisStatusLabel.setText("📊 Status: Erro durante análise");
+            textArea.setText("ERRO durante a análise:\n\n" + ex.getMessage());
+            analysisStatusLabel.setText("Status: Erro durante análise");
             analysisStatusLabel.setForeground(new Color(231, 76, 60));
         }
     }
@@ -350,17 +350,17 @@ public class FileSenderApp extends JFrame {
         textArea.append("                    RESULTADO DA ANÁLISE LÉXICA\n");
         textArea.append("=".repeat(80) + "\n\n");
 
-        textArea.append("📄 Arquivo analisado: " + selectedFile.getName() + "\n");
-        textArea.append("📊 Linhas processadas: " + totalLines + "\n");
-        textArea.append("🎯 Tokens encontrados: " + tokens.size() + "\n");
-        textArea.append("⏰ Análise concluída em: " + java.time.LocalDateTime.now().format(
+        textArea.append("Arquivo analisado: " + selectedFile.getName() + "\n");
+        textArea.append("Linhas processadas: " + totalLines + "\n");
+        textArea.append("Tokens encontrados: " + tokens.size() + "\n");
+        textArea.append("Análise concluída em: " + java.time.LocalDateTime.now().format(
                 java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n\n");
 
         if (tokens.isEmpty()) {
-            textArea.append("⚠️  Nenhum token válido foi encontrado no arquivo.\n");
-            textArea.append("    Verifique se o arquivo contém código válido.\n");
+            textArea.append("Nenhum token válido foi encontrado no arquivo.\n");
+            textArea.append("Verifique se o arquivo contém código válido.\n");
         } else {
-            textArea.append("📋 LISTA DE TOKENS RECONHECIDOS:\n");
+            textArea.append("LISTA DE TOKENS RECONHECIDOS:\n");
             textArea.append("-".repeat(50) + "\n");
 
             int tokenCount = 1;
@@ -372,11 +372,11 @@ public class FileSenderApp extends JFrame {
             }
 
             textArea.append("-".repeat(50) + "\n");
-            textArea.append("✅ Análise léxica concluída com sucesso!\n");
+            textArea.append("Análise léxica concluída com sucesso!\n");
         }
 
         // Update status
-        analysisStatusLabel.setText("📊 Status: Análise concluída - " + tokens.size() + " tokens encontrados");
+        analysisStatusLabel.setText("Status: Análise concluída - " + tokens.size() + " tokens encontrados");
         analysisStatusLabel.setForeground(new Color(39, 174, 96));
     }
 
