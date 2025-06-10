@@ -66,6 +66,8 @@ public class FileSenderApp extends JFrame {
 
         // Initialize with welcome message
         showWelcomeMessage();
+
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     private JPanel createHeaderPanel() {
