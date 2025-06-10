@@ -1,12 +1,11 @@
 package model;
 
-public record TokenModel(String name, String code) {
+import tokens.IToken;
+
+public record TokenModel(IToken token, String lexeme) {
 
     @Override
     public String toString() {
-        return "TokenModel{" +
-                "name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                '}';
+        return String.format("Token: %s (%s), Lexeme: '%s'", token.getName(), token.getCode(), lexeme);
     }
 }

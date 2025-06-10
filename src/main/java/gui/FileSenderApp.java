@@ -1,7 +1,8 @@
 package gui;
 
 import model.TokenModel;
-import service.FileReaderService;
+import service.LexerService;
+import shared.utils.FileReaderUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -102,22 +103,36 @@ public class FileSenderApp extends JFrame {
                 return;
             }
 
-            Map<Integer, List<TokenModel>> tokenMap = FileReaderService.processFile(selectedFile.getPath());
+            // 1. Lê as linhas do arquivo
+            Map<Integer, String> lines = FileReaderUtils.readFileLines(selectedFile.getPath());
+
             textArea.setText("");
 
-            if (tokenMap.isEmpty()) {
-                textArea.append("No valid tokens found.\n");
+            if (lines.isEmpty()) {
+                textArea.append("No valid lines found in the file.\n");
+                return;
+            }
+
+            // 2. Junta as linhas em uma string única para o lexer
+            StringBuilder sourceBuilder = new StringBuilder();
+            for (String line : lines.values()) {
+                sourceBuilder.append(line).append("\n");
+            }
+            String source = sourceBuilder.toString();
+
+            LexerService lexerService = new LexerService(source);
+            List<TokenModel> tokens = lexerService.tokenize();
+
+            if (tokens.isEmpty()) {
+                textArea.append("No tokens found.\n");
             } else {
-                for (Map.Entry<Integer, List<TokenModel>> entry : tokenMap.entrySet()) {
-                    textArea.append("Line " + entry.getKey() + ":\n");
-                    for (TokenModel token : entry.getValue()) {
-                        textArea.append("  → " + token + "\n");
-                    }
-                    textArea.append("\n");
+                for (TokenModel token : tokens) {
+                    textArea.append(token.toString() + "\n");
                 }
             }
 
         });
+
     }
 
     public static void main(String[] args) {

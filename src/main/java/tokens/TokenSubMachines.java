@@ -17,12 +17,19 @@ public enum TokenSubMachines implements IToken {
         this.code = code;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public TokenType getType() {
+        return TokenType.SUB_MACHINE;
     }
 
     private static final Map<String, TokenSubMachines> TokenList = new HashMap<>();

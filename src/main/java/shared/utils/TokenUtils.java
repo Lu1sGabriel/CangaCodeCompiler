@@ -1,10 +1,10 @@
-package tokens;
+package shared.utils;
+
+import tokens.*;
 
 public class TokenUtils {
 
     public static IToken findTokenByWord(String word) {
-        if (word == null) return null;
-
         IToken token;
 
         token = TokenIdentifiers.getTokenByName(word);
@@ -19,5 +19,4 @@ public class TokenUtils {
         token = TokenSubMachines.getTokenByName(word);
         return token;
     }
-
 }

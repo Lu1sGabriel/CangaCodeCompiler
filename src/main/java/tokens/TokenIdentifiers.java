@@ -20,12 +20,19 @@ public enum TokenIdentifiers implements IToken {
         this.code = code;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public TokenType getType() {
+        return TokenType.IDENTIFIER;
     }
 
     private static final Map<String, TokenIdentifiers> TokenList = new HashMap<>();

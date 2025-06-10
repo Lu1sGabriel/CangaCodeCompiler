@@ -39,12 +39,19 @@ public enum TokenReservedWords implements IToken {
         this.code = code;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public TokenType getType() {
+        return TokenType.RESERVED_WORD;
     }
 
     private static final Map<String, TokenReservedWords> TokenList = new HashMap<>();

@@ -37,12 +37,19 @@ public enum TokenReservedSymbols implements IToken {
         this.code = code;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public TokenType getType() {
+        return TokenType.RESERVED_SYMBOL;
     }
 
     private static final Map<String, TokenReservedSymbols> TokenList = new HashMap<>();
