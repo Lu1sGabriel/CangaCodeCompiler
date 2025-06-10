@@ -1,0 +1,20 @@
+// Programa exemplo para testes léxicos
+
+integer x := 10;
+character letra := 'a';
+string nome := "Luis";
+real pi := 3.14; // Valor de pi (comentário deve ser ignorado)
+
+if x >= 5 then
+    submachine1;
+
+while nome != "admin" do
+    nome := "user";
+
+invalid_token123
+'$'
+"string com quebra
+'n'
+
+begin
+end
