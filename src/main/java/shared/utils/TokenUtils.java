@@ -2,7 +2,10 @@ package shared.utils;
 
 import tokens.*;
 
-public class TokenUtils {
+final public class TokenUtils {
+
+    private TokenUtils() {
+    }
 
     public static IToken findTokenByWord(String word) {
         IToken token;
@@ -19,4 +22,5 @@ public class TokenUtils {
         token = TokenSubMachines.getTokenByName(word);
         return token;
     }
+
 }

@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class FileReaderUtils {
+final public class FileReaderUtils {
+
+    private FileReaderUtils() {
+    }
 
     public static Map<Integer, String> readFileLines(String filePath) {
         Map<Integer, String> linesByNumber = new LinkedHashMap<>();
@@ -28,4 +31,5 @@ public class FileReaderUtils {
 
         return linesByNumber;
     }
+
 }

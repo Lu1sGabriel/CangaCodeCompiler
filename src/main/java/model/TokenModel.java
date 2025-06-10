@@ -8,4 +8,5 @@ public record TokenModel(IToken token, String lexeme) {
     public String toString() {
         return String.format("Token: %s (%s), Lexeme: '%s'", token.getName(), token.getCode(), lexeme);
     }
+
 }
