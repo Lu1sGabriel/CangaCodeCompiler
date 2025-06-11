@@ -3,8 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenReservedSymbols implements Token{
-
+public enum TokenReservedSymbols implements IToken {
     PONTOVIRGULA(";", "SRS01"),
     VIRGULA(",", "SRS02"),
     DOISPONTOS(":", "SRS03"),
@@ -29,7 +28,6 @@ public enum TokenReservedSymbols implements Token{
     MAIOR(">", "SRS21"),
     MAIORIGUAL(">=", "SRS22");
 
-
     private final String name;
     private final String code;
 
@@ -38,27 +36,29 @@ public enum TokenReservedSymbols implements Token{
         this.code = code;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
     private static final Map<String, TokenReservedSymbols> TokenList = new HashMap<>();
+
     static {
         for (TokenReservedSymbols token : TokenReservedSymbols.values()) {
             TokenList.put(token.getName(), token);
         }
     }
 
-
-    public static TokenReservedSymbols getTokenByName (String word) {
-        if (word == null){
+    public static TokenReservedSymbols getTokenByName(String word) {
+        if (word == null) {
             return null;
         }
         return TokenList.get(word);
-
     }
+
 }

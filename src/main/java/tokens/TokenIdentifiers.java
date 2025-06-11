@@ -3,7 +3,7 @@ package tokens;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum TokenIdentifiers implements Token {
+public enum TokenIdentifiers implements IToken {
     PROGRAMNAME("programName", "IDN01"),
     VARIABLE("variable", "IDN02"),
     FUNCTIONNAME("functionName", "IDN03"),
@@ -20,27 +20,29 @@ public enum TokenIdentifiers implements Token {
         this.code = code;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
     private static final Map<String, TokenIdentifiers> TokenList = new HashMap<>();
+
     static {
         for (TokenIdentifiers token : TokenIdentifiers.values()) {
             TokenList.put(token.getName(), token);
         }
     }
 
-    public static TokenIdentifiers getTokenByName (String word) {
-        if (word == null){
+    public static TokenIdentifiers getTokenByName(String word) {
+        if (word == null) {
             return null;
         }
         return TokenList.get(word);
-
     }
 
 }
