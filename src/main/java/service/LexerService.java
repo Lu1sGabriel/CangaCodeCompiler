@@ -4,89 +4,121 @@ import model.TokenModel;
 import shared.utils.TokenUtils;
 import tokens.TokenIdentifiers;
 import tokens.TokenReservedSymbols;
+import tokens.TokenReservedWords;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/**
- * Serviço de análise léxica para tokenizar (quebrar em unidades) o código fonte.
- * <p>
- * Este serviço percorre o código-fonte caractere por caractere e produz
- * uma lista de tokens válidos, ignorando os inválidos ou não reconhecidos.
- */
 public final class LexerService {
 
-    // Constantes para representar caracteres especiais
-    private static final char NULL_CHAR = '\0';              // Caractere nulo
-    private static final char NEWLINE = '\n';                // Quebra de linha
-    private static final char QUOTE = '"';                   // Aspas duplas
-    private static final char SINGLE_QUOTE = '\'';           // Aspas simples
-    private static final char DOT = '.';                     // Ponto
-    private static final char UNDERSCORE = '_';              // Underscore
-    private static final char FORWARD_SLASH = '/';           // Barra (/)
+    private static final char NULL_CHAR = '\0';
+    private static final char NEWLINE = '\n';
+    private static final char QUOTE = '"';
+    private static final char SINGLE_QUOTE = '\'';
+    private static final char DOT = '.';
+    private static final char UNDERSCORE = '_';
+    private static final char FORWARD_SLASH = '/';
 
-    private static final String COMMENT_START = "//";        // Início de comentário
-    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*"); // Expressão para identificadores válidos
+    private static final String COMMENT_START = "//";
+    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
 
-    private final String source;         // Código-fonte a ser analisado
-    private final int sourceLength;     // Tamanho do código-fonte
-    private int currentPosition = 0;    // Posição atual de leitura
+    private final SymbolTableService symbolTableService = new SymbolTableService();
 
-    /**
-     * Construtor: cria um novo analisador léxico com o código-fonte fornecido.
-     *
-     * @param source o código-fonte a ser tokenizado
-     * @throws IllegalArgumentException se o código fonte for nulo
-     */
+    private final String source;
+    private final int sourceLength;
+    private int currentPosition = 0;
+    private int currentLine = 1;
+
     public LexerService(String source) {
         this.source = Objects.requireNonNull(source, "Código fonte não pode ser nulo");
         this.sourceLength = source.length();
     }
 
-    /**
-     * Realiza a tokenização do código-fonte, retornando uma lista de tokens válidos.
-     * Tokens inválidos ou não reconhecidos são ignorados.
-     *
-     * @return lista imutável de tokens válidos
-     */
+    public SymbolTableService getSymbolTable() {
+        return symbolTableService;
+    }
+
     public List<TokenModel> tokenize() {
-        final ArrayList<TokenModel> tokens = new ArrayList<>();
+        var tokens = new ArrayList<TokenModel>();
 
         while (!isAtEnd()) {
-            skipWhitespace(); // Ignora espaços em branco
-
+            skipWhitespace();
             if (isAtEnd()) break;
 
             if (isCommentStart()) {
-                skipComment(); // Ignora linha de comentário
+                skipComment();
                 continue;
             }
 
-            var token = readNextToken();
-            if (isValidToken(token)) {
-                tokens.add(token); // Adiciona token válido
+            int startLine = currentLine;
+
+            TokenModel firstToken = readNextToken();
+            if (firstToken == null) continue;
+
+            // Se for um tipo primitivo (string, integer, character, real)
+            if (firstToken.token() instanceof TokenReservedWords reservedWord &&
+                    isPrimitiveType(reservedWord)) {
+
+                skipWhitespace();
+                TokenModel nextToken = readNextToken();
+
+                if (!isValidDeclarationPair(reservedWord, nextToken)) {
+                    // Ignora linha inválida
+                    skipLine(startLine);
+                    continue;
+                }
+
+                tokens.add(firstToken);
+                tokens.add(nextToken);
+                symbolTableService.add(firstToken.lexeme(), firstToken.token());
+                symbolTableService.add(nextToken.lexeme(), nextToken.token());
+
+            } else {
+                if (isValidToken(firstToken)) {
+                    tokens.add(firstToken);
+                    symbolTableService.add(firstToken.lexeme(), firstToken.token());
+                }
             }
         }
 
-        return List.copyOf(tokens); // Retorna lista imutável
+        return List.copyOf(tokens);
     }
 
-    /**
-     * Lê e retorna o próximo token a partir da posição atual.
-     *
-     * @return o próximo token ou null se inválido
-     */
+    private boolean isPrimitiveType(TokenReservedWords token) {
+        return token == TokenReservedWords.INTEGER ||
+                token == TokenReservedWords.REAL ||
+                token == TokenReservedWords.STRING ||
+                token == TokenReservedWords.CHARACTER;
+    }
+
+    private boolean isValidDeclarationPair(TokenReservedWords typeToken, TokenModel nextToken) {
+        if (nextToken == null) return false;
+
+        return switch (typeToken) {
+            case INTEGER -> nextToken.token() == TokenIdentifiers.INTCONST || nextToken.token() == TokenIdentifiers.VARIABLE;
+            case REAL -> nextToken.token() == TokenIdentifiers.REALCONST || nextToken.token() == TokenIdentifiers.VARIABLE;
+            case STRING -> nextToken.token() == TokenIdentifiers.STRINGCONST || nextToken.token() == TokenIdentifiers.VARIABLE;
+            case CHARACTER -> nextToken.token() == TokenIdentifiers.CHARCONST || nextToken.token() == TokenIdentifiers.VARIABLE;
+            default -> false;
+        };
+    }
+
+    private void skipLine(int lineToSkip) {
+        while (!isAtEnd() && currentLine == lineToSkip) {
+            advance();
+        }
+    }
+
     private TokenModel readNextToken() {
         char currentChar = peekChar();
-
         return switch (getCharacterType(currentChar)) {
-            case LETTER_OR_UNDERSCORE -> readIdentifierOrKeyword();   // Identificador ou palavra-chave
-            case DIGIT -> readNumericLiteral();                       // Número (inteiro ou real)
-            case QUOTE_CHAR -> readStringLiteral();                   // String entre aspas
-            case SINGLE_QUOTE_CHAR -> readCharacterLiteral();         // Caractere entre aspas simples
-            case SYMBOL -> readSymbol();                              // Símbolo reservado
+            case LETTER_OR_UNDERSCORE -> readIdentifierOrKeyword();
+            case DIGIT -> readNumericLiteral();
+            case QUOTE_CHAR -> readStringLiteral();
+            case SINGLE_QUOTE_CHAR -> readCharacterLiteral();
+            case SYMBOL -> readSymbol();
             case UNKNOWN -> {
                 advance(); // Ignora caractere desconhecido
                 yield null;
@@ -94,9 +126,6 @@ public final class LexerService {
         };
     }
 
-    /**
-     * Retorna o tipo de caractere para ajudar na decisão de qual token ler.
-     */
     private CharacterType getCharacterType(char c) {
         if (Character.isLetter(c) || c == UNDERSCORE) return CharacterType.LETTER_OR_UNDERSCORE;
         if (Character.isDigit(c)) return CharacterType.DIGIT;
@@ -106,211 +135,150 @@ public final class LexerService {
         return CharacterType.UNKNOWN;
     }
 
-    /**
-     * Verifica se o caractere pode ser parte de um símbolo reservado.
-     */
     private boolean isPotentialSymbol(char c) {
-        return !Character.isWhitespace(c) &&
-                !Character.isLetterOrDigit(c) &&
-                c != UNDERSCORE && c != QUOTE && c != SINGLE_QUOTE;
+        return !Character.isWhitespace(c)
+                && !Character.isLetterOrDigit(c)
+                && c != UNDERSCORE && c != QUOTE && c != SINGLE_QUOTE;
     }
 
-    /**
-     * Lê um identificador (variável) ou palavra-chave do código.
-     */
     private TokenModel readIdentifierOrKeyword() {
-        var lexeme = readWhile(c -> Character.isLetterOrDigit(c) || c == UNDERSCORE);
-
-        // Verifica se é uma palavra-chave reservada
+        String lexeme = readWhile(ch -> Character.isLetterOrDigit(ch) || ch == UNDERSCORE);
         var keywordToken = TokenUtils.findTokenByWord(lexeme);
+
         if (keywordToken != null) {
-            return new TokenModel(keywordToken, lexeme);
+            return new TokenModel(keywordToken, lexeme, currentLine);
         }
 
-        // Verifica se é um identificador válido
         if (isValidIdentifier(lexeme)) {
-            return new TokenModel(TokenIdentifiers.VARIABLE, lexeme);
+            return new TokenModel(TokenIdentifiers.VARIABLE, lexeme, currentLine);
         }
 
-        return null; // Identificador inválido
+        return null;
     }
 
-    /**
-     * Verifica se uma string é um identificador válido.
-     */
     private boolean isValidIdentifier(String identifier) {
-        return identifier != null &&
-                !identifier.isEmpty() &&
-                IDENTIFIER_PATTERN.matcher(identifier).matches();
+        return identifier != null && !identifier.isEmpty() && IDENTIFIER_PATTERN.matcher(identifier).matches();
     }
 
-    /**
-     * Lê um número inteiro ou real do código.
-     */
     private TokenModel readNumericLiteral() {
-        var integerPart = readWhile(Character::isDigit);
+        String integerPart = readWhile(Character::isDigit);
 
-        // Verifica se há um ponto para literal real
         if (peekChar() == DOT && isDigitAtPosition(currentPosition + 1)) {
-            advance(); // Consome o ponto
-            var fractionalPart = readWhile(Character::isDigit);
+            advance();
+            String fractionalPart = readWhile(Character::isDigit);
 
-            if (fractionalPart.isEmpty()) {
-                return null; // Ponto sem dígitos após ele
-            }
+            if (fractionalPart.isEmpty()) return null;
 
-            var realLiteral = integerPart + DOT + fractionalPart;
-            return new TokenModel(TokenIdentifiers.REALCONST, realLiteral);
+            String realLiteral = integerPart + DOT + fractionalPart;
+            return new TokenModel(TokenIdentifiers.REALCONST, realLiteral, currentLine);
         }
 
-        return new TokenModel(TokenIdentifiers.INTCONST, integerPart);
+        return new TokenModel(TokenIdentifiers.INTCONST, integerPart, currentLine);
     }
 
-    /**
-     * Lê uma string entre aspas.
-     */
     private TokenModel readStringLiteral() {
-        advance(); // Consome aspas de abertura
+        advance();
 
-        var content = new StringBuilder();
+        StringBuilder content = new StringBuilder();
 
         while (!isAtEnd() && peekChar() != QUOTE) {
             char c = advance();
-            if (c == NEWLINE) return null; // String não pode conter nova linha
+            if (c == NEWLINE) return null;
             content.append(c);
         }
 
-        if (isAtEnd()) return null; // String sem aspas de fechamento
+        if (isAtEnd()) return null;
 
-        advance(); // Consome aspas de fechamento
-        return new TokenModel(TokenIdentifiers.STRINGCONST, content.toString());
+        advance();
+        return new TokenModel(TokenIdentifiers.STRINGCONST, content.toString(), currentLine);
     }
 
-    /**
-     * Lê um caractere entre aspas simples.
-     */
     private TokenModel readCharacterLiteral() {
-        advance(); // Consome aspas de abertura
+        advance();
 
         if (isAtEnd()) return null;
 
-        char character = advance();
+        char c = advance();
 
-        if (character == SINGLE_QUOTE || character == NEWLINE) {
-            return null; // Caractere vazio ou quebra de linha
-        }
+        if (c == SINGLE_QUOTE || c == NEWLINE) return null;
 
-        if (isAtEnd() || advance() != SINGLE_QUOTE) {
-            return null; // Não fechou corretamente
-        }
+        if (isAtEnd() || advance() != SINGLE_QUOTE) return null;
 
-        return new TokenModel(TokenIdentifiers.CHARCONST, String.valueOf(character));
+        return new TokenModel(TokenIdentifiers.CHARCONST, String.valueOf(c), currentLine);
     }
 
-    /**
-     * Lê um símbolo reservado (ex: operadores como ==, <=, etc).
-     */
     private TokenModel readSymbol() {
-        // Verifica símbolos de dois caracteres
         if (currentPosition + 1 < sourceLength) {
-            var twoCharSymbol = source.substring(currentPosition, currentPosition + 2);
+            String twoCharSymbol = source.substring(currentPosition, currentPosition + 2);
             var token = TokenReservedSymbols.getTokenByName(twoCharSymbol);
-
             if (token != null) {
                 currentPosition += 2;
-                return new TokenModel(token, twoCharSymbol);
+                return new TokenModel(token, twoCharSymbol, currentLine);
             }
         }
 
-        // Tenta com um caractere só
-        var oneCharSymbol = String.valueOf(advance());
+        String oneCharSymbol = String.valueOf(advance());
         var token = TokenReservedSymbols.getTokenByName(oneCharSymbol);
 
-        return token != null ? new TokenModel(token, oneCharSymbol) : null;
+        return token != null ? new TokenModel(token, oneCharSymbol, currentLine) : null;
     }
 
-    /**
-     * Lê caracteres enquanto a condição fornecida for verdadeira.
-     */
-    private String readWhile(java.util.function.Predicate<Character> predicate) {
-        var result = new StringBuilder();
+    private String readWhile(java.util.function.Predicate<Character> condition) {
+        StringBuilder result = new StringBuilder();
 
-        while (!isAtEnd() && predicate.test(peekChar())) {
+        while (!isAtEnd() && condition.test(peekChar())) {
             result.append(advance());
         }
 
         return result.toString();
     }
 
-    /**
-     * Verifica se o ponto atual inicia um comentário (//).
-     */
     private boolean isCommentStart() {
         return peekChar() == FORWARD_SLASH &&
                 currentPosition + 1 < sourceLength &&
                 source.charAt(currentPosition + 1) == FORWARD_SLASH;
     }
 
-    /**
-     * Pula (ignora) a linha atual de comentário.
-     */
     private void skipComment() {
         currentPosition += COMMENT_START.length();
-        readWhile(c -> c != NEWLINE); // Lê até a próxima quebra de linha
+        readWhile(c -> c != NEWLINE);
     }
 
-    /**
-     * Pula espaços em branco.
-     */
     private void skipWhitespace() {
         readWhile(Character::isWhitespace);
     }
 
-    /**
-     * Verifica se o token é válido (não nulo e com tipo válido).
-     */
     private boolean isValidToken(TokenModel token) {
         return token != null && token.token() != null;
     }
 
-    /**
-     * Verifica se há um dígito na posição especificada.
-     */
-    private boolean isDigitAtPosition(int position) {
-        return position < sourceLength && Character.isDigit(source.charAt(position));
+    private boolean isDigitAtPosition(int pos) {
+        return pos < sourceLength && Character.isDigit(source.charAt(pos));
     }
 
-    /**
-     * Retorna o caractere atual sem avançar a posição.
-     */
     private char peekChar() {
         return isAtEnd() ? NULL_CHAR : source.charAt(currentPosition);
     }
 
-    /**
-     * Avança para o próximo caractere e retorna o atual.
-     */
     private char advance() {
-        return isAtEnd() ? NULL_CHAR : source.charAt(currentPosition++);
+        if (isAtEnd()) return NULL_CHAR;
+
+        char c = source.charAt(currentPosition++);
+        if (c == NEWLINE) currentLine++;
+        return c;
     }
 
-    /**
-     * Verifica se chegou ao final do código fonte.
-     */
     private boolean isAtEnd() {
         return currentPosition >= sourceLength;
     }
 
-    /**
-     * Enumeração com os tipos de caracteres reconhecidos para a análise.
-     */
     private enum CharacterType {
-        LETTER_OR_UNDERSCORE,   // Letra ou underscore (ex: nomes de variáveis)
-        DIGIT,                  // Dígito numérico
-        QUOTE_CHAR,             // Aspas duplas (strings)
-        SINGLE_QUOTE_CHAR,      // Aspas simples (char)
-        SYMBOL,                 // Símbolo especial (operadores, pontuação, etc.)
-        UNKNOWN                 // Caractere desconhecido
+        LETTER_OR_UNDERSCORE,
+        DIGIT,
+        QUOTE_CHAR,
+        SINGLE_QUOTE_CHAR,
+        SYMBOL,
+        UNKNOWN
     }
 
 }

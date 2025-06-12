@@ -2,6 +2,7 @@ package gui;
 
 import model.TokenModel;
 import service.LexerService;
+import service.SymbolTableService;
 import shared.utils.FileReaderUtils;
 
 import javax.swing.*;
@@ -375,6 +376,8 @@ public class FileSenderApp extends JFrame {
             // Perform lexical analysis
             LexerService lexerService = new LexerService(source);
             List<TokenModel> tokens = lexerService.tokenize();
+            SymbolTableService symbolTableService = lexerService.getSymbolTable();
+            System.out.println(symbolTableService);
 
             // Display results
             displayAnalysisResults(tokens, lines.size());
@@ -407,11 +410,12 @@ public class FileSenderApp extends JFrame {
             int tokenCount = 1;
             for (TokenModel token : tokens) {
                 textArea.append(String.format(
-                        "%3d. %-20s | %-40s | %-10s\n",
+                        "%3d. %-20s | %-40s | %-10s | %-10s\n",
                         tokenCount++,
                         token.token().getName(),
                         "Lexema: \"" + token.lexeme() + "\"",
-                        "Code: \"" + token.token().getCode() + "\""
+                        "Code: \"" + token.token().getCode() + "\" ",
+                        "Line: \"" + token.line() + "\" "
                 ));
             }
 
