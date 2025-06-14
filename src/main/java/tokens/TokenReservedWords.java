@@ -29,8 +29,11 @@ public enum TokenReservedWords implements IToken {
     WHILE("while", "PRS23"),
     DO("do", "PRS24"),
     ENDWHILE("endWhile", "PRS25"),
-    BREAK("break", "PRS26"),
-    PRINT("print", "PRS27");
+    THEN("then", "PRS26"),
+    BEGIN("begin", "PRS27"),
+    END("end", "PRS28"),
+    BREAK("break", "PRS29"),
+    PRINT("print", "PRS30");
 
     private final String name;
     private final String code;

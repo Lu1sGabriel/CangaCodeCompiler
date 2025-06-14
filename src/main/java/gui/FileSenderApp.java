@@ -407,12 +407,10 @@ public class FileSenderApp extends JFrame {
             textArea.append("LISTA DE TOKENS RECONHECIDOS:\n");
             textArea.append("-".repeat(50) + "\n");
 
-            int tokenCount = 1;
             for (TokenModel token : tokens) {
                 textArea.append(String.format(
-                        "%3d. %-20s | %-40s | %-10s | %-10s\n",
-                        tokenCount++,
-                        token.token().getName(),
+                        "%-40s |%-40s | %-10s | %-10s\n",
+                        "Índice na tabela de símbolos: \"" + token.symbolTableIndex() + "\"",
                         "Lexema: \"" + token.lexeme() + "\"",
                         "Code: \"" + token.token().getCode() + "\" ",
                         "Line: \"" + token.line() + "\" "

@@ -70,20 +70,38 @@ public final class LexerService {
                     continue;
                 }
 
-                tokens.add(firstToken);
-                tokens.add(nextToken);
-                symbolTableService.add(firstToken.lexeme(), firstToken.token());
-                symbolTableService.add(nextToken.lexeme(), nextToken.token());
+                // Adiciona os tokens com índice da tabela de símbolos
+                TokenModel firstTokenWithIndex = addToSymbolTableAndCreateToken(firstToken);
+                TokenModel nextTokenWithIndex = addToSymbolTableAndCreateToken(nextToken);
+
+                tokens.add(firstTokenWithIndex);
+                tokens.add(nextTokenWithIndex);
 
             } else {
                 if (isValidToken(firstToken)) {
-                    tokens.add(firstToken);
-                    symbolTableService.add(firstToken.lexeme(), firstToken.token());
+                    TokenModel tokenWithIndex = addToSymbolTableAndCreateToken(firstToken);
+                    tokens.add(tokenWithIndex);
                 }
             }
         }
 
         return List.copyOf(tokens);
+    }
+
+    /**
+     * Adiciona o token à tabela de símbolos e retorna um novo TokenModel com o índice
+     */
+    private TokenModel addToSymbolTableAndCreateToken(TokenModel token) {
+        if (token == null) return null;
+
+        // Obtém o índice antes de adicionar à tabela de símbolos
+        int symbolTableIndex = symbolTableService.getNextIndex();
+
+        // Adiciona à tabela de símbolos
+        symbolTableService.add(token.lexeme(), token.token());
+
+        // Retorna um novo token com o índice da tabela de símbolos
+        return new TokenModel(token.token(), token.lexeme(), token.line(), symbolTableIndex);
     }
 
     private boolean isPrimitiveType(TokenReservedWords token) {

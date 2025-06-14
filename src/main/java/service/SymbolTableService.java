@@ -22,6 +22,28 @@ public class SymbolTableService {
         this.truncationLimit = truncationLimit;
     }
 
+    /**
+     * Retorna o próximo índice que será usado na tabela de símbolos
+     */
+    public int getNextIndex() {
+        return index;
+    }
+
+    /**
+     * Retorna o índice de um símbolo na tabela, ou -1 se não encontrado
+     */
+    public int getSymbolIndex(String lexeme) {
+        SymbolEntryModel entry = table.get(lexeme);
+        return entry != null ? entry.index() : -1;
+    }
+
+    /**
+     * Verifica se um símbolo já existe na tabela
+     */
+    public boolean contains(String lexeme) {
+        return table.containsKey(lexeme);
+    }
+
     public void add(String lexeme, IToken token) {
         if (!isStorable(token) || table.containsKey(lexeme)) return;
 
@@ -38,9 +60,27 @@ public class SymbolTableService {
         return iToken != null;
     }
 
+    /**
+     * Retorna uma cópia da tabela de símbolos
+     */
+    public Map<String, SymbolEntryModel> getTable() {
+        return new LinkedHashMap<>(table);
+    }
+
+    /**
+     * Retorna o número total de símbolos na tabela
+     */
+    public int size() {
+        return table.size();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Tabela de Símbolos:\n");
+        sb.append(String.format("%-6s | %-6s | %-35s | %-10s | %-12s | %s%n",
+                "Índice", "Linha", "Lexema", "Truncado", "Não Truncado", "Token"));
+        sb.append("-".repeat(90)).append("\n");
+
         for (SymbolEntryModel entry : table.values()) {
             sb.append(entry.toString()).append("\n");
         }
