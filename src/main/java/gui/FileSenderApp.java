@@ -28,11 +28,12 @@ public class FileSenderApp extends JFrame {
     private String lastAnalysisContent;
 
     // Informações da equipe - ALTERE AQUI CONFORME SUA EQUIPE
-    private static final String TEAM_CODE = "EQUIPE-001";
+    private static final String TEAM_CODE = "EQ04";
     private static final String[] TEAM_MEMBERS = {
-            "João Silva - Matrícula: 12345678",
-            "Maria Santos - Matrícula: 87654321",
-            "Pedro Oliveira - Matrícula: 11223344"
+            "Diogo de Aguiar Barreto; diogo.barreto@ucsal.edu.br; (71)9 84035572",
+            "Luis Gabriel Goés de Santana; luisgabriel.santana@ucsal.edu.br; (71)9 9997-9545",
+            "Vitor Gabriel Fontes Santos; vitorgabriel.santos@ucsal.edu.br; (71)9 8231-1753",
+            "João Fábio Argôlo de Almeida Júnior; joaofabio.junior@ucsal.edu.br; (71)9 8649-5653"
     };
 
     public FileSenderApp() {
@@ -44,7 +45,7 @@ public class FileSenderApp extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         setResizable(true);
-        setUIFont(new Font("Segoe UI", Font.PLAIN, 12));
+        setUIFont(new Font("Segoe UI", Font.PLAIN, 18));
 
         // ===== HEADER PANEL =====
         JPanel headerPanel = createHeaderPanel();
@@ -53,7 +54,7 @@ public class FileSenderApp extends JFrame {
         // ===== CENTER TEXT AREA =====
         textArea = new JTextArea();
         textArea.setEditable(false);
-        textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+        textArea.setFont(new Font("Consolas", Font.PLAIN, 18));
         textArea.setBackground(new Color(248, 249, 250));
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -63,7 +64,7 @@ public class FileSenderApp extends JFrame {
                 "Resultado da Análise Léxica",
                 TitledBorder.LEFT,
                 TitledBorder.TOP,
-                new Font("Segoe UI", Font.BOLD, 12)
+                new Font("Segoe UI", Font.BOLD, 18)
         ));
 
         add(scrollPane, BorderLayout.CENTER);
