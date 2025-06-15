@@ -1,4 +1,4 @@
-// Programa exemplo para testes léxicos
+// Programa exemplo para testes do mini compilador léxico
 
 integer x := 10;
 character letra := 'a';

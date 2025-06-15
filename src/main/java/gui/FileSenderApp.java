@@ -2,6 +2,7 @@ package gui;
 
 import model.TokenModel;
 import service.LexerService;
+import service.SymbolTableService;
 import shared.utils.FileReaderUtils;
 
 import javax.swing.*;
@@ -9,6 +10,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +23,9 @@ public class FileSenderApp extends JFrame {
     private JLabel selectedFileLabel;
     private JLabel analysisStatusLabel;
     private File selectedFile;
+    private List<TokenModel> lastTokens;
+    private SymbolTableService lastSymbolTable;
+    private String lastAnalysisContent;
 
     // Informações da equipe - ALTERE AQUI CONFORME SUA EQUIPE
     private static final String TEAM_CODE = "EQUIPE-001";
@@ -191,17 +199,20 @@ public class FileSenderApp extends JFrame {
         JButton btnChooseFile = new JButton("Escolher Arquivo");
         JButton btnOpenExisting = new JButton("Abrir da Pasta '251'");
         JButton btnAnalyzeFile = new JButton("Analisar Arquivo");
+        JButton btnSaveResults = new JButton("Salvar Resultados");
 
 
         // Style buttons
         styleButton(btnChooseFile, new Color(52, 152, 219));
         styleButton(btnOpenExisting, new Color(155, 89, 182));
         styleButton(btnAnalyzeFile, new Color(46, 204, 113));
+        styleButton(btnSaveResults, new Color(230, 126, 34));
 
         // Set button alignment and size
         btnChooseFile.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnOpenExisting.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAnalyzeFile.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnSaveResults.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Make buttons same width
         Dimension buttonSize = new Dimension(180, 35);
@@ -211,6 +222,11 @@ public class FileSenderApp extends JFrame {
         btnOpenExisting.setMaximumSize(buttonSize);
         btnAnalyzeFile.setPreferredSize(buttonSize);
         btnAnalyzeFile.setMaximumSize(buttonSize);
+        btnSaveResults.setPreferredSize(buttonSize);
+        btnSaveResults.setMaximumSize(buttonSize);
+
+        // Initially disable save button
+        btnSaveResults.setEnabled(false);
 
         panel.add(Box.createVerticalStrut(5));
         panel.add(btnChooseFile);
@@ -218,10 +234,12 @@ public class FileSenderApp extends JFrame {
         panel.add(btnOpenExisting);
         panel.add(Box.createVerticalStrut(8));
         panel.add(btnAnalyzeFile);
+        panel.add(Box.createVerticalStrut(8));
+        panel.add(btnSaveResults);
         panel.add(Box.createVerticalStrut(5));
 
         // Add action listeners
-        setupButtonActions(btnChooseFile, btnOpenExisting, btnAnalyzeFile);
+        setupButtonActions(btnChooseFile, btnOpenExisting, btnAnalyzeFile, btnSaveResults);
 
         return panel;
     }
@@ -248,7 +266,8 @@ public class FileSenderApp extends JFrame {
         return bottomPanel;
     }
 
-    private void setupButtonActions(JButton btnChooseFile, JButton btnOpenExisting, JButton btnAnalyzeFile) {
+    private void setupButtonActions(JButton btnChooseFile, JButton btnOpenExisting,
+                                    JButton btnAnalyzeFile, JButton btnSaveResults) {
         btnChooseFile.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             chooser.setFileFilter(new FileNameExtensionFilter("Arquivos .251", "251"));
@@ -260,6 +279,8 @@ public class FileSenderApp extends JFrame {
                 updateFileSelection();
                 textArea.setText("");
                 showFileSelectedMessage();
+                btnSaveResults.setEnabled(false);
+                clearAnalysisResults();
             }
         });
 
@@ -300,10 +321,23 @@ public class FileSenderApp extends JFrame {
                 updateFileSelection();
                 textArea.setText("");
                 showFileSelectedMessage();
+                btnSaveResults.setEnabled(false);
+                clearAnalysisResults();
             }
         });
 
-        btnAnalyzeFile.addActionListener(e -> performLexicalAnalysis());
+        btnAnalyzeFile.addActionListener(e -> {
+            performLexicalAnalysis();
+            btnSaveResults.setEnabled(lastTokens != null && !lastTokens.isEmpty());
+        });
+
+        btnSaveResults.addActionListener(e -> saveAnalysisResults());
+    }
+
+    private void clearAnalysisResults() {
+        lastTokens = null;
+        lastSymbolTable = null;
+        lastAnalysisContent = null;
     }
 
     private void updateFileSelection() {
@@ -320,7 +354,8 @@ public class FileSenderApp extends JFrame {
         textArea.append("INSTRUÇÕES:\n");
         textArea.append("1. Selecione um arquivo .251 usando os botões acima\n");
         textArea.append("2. Clique em 'Analisar Arquivo' para executar a análise léxica\n");
-        textArea.append("3. Os tokens encontrados serão exibidos nesta área\n\n");
+        textArea.append("3. Os tokens encontrados serão exibidos nesta área\n");
+        textArea.append("4. Use 'Salvar Resultados' para exportar os arquivos .lex e .tab\n\n");
         textArea.append("O analisador reconhece:\n");
         textArea.append("• Identificadores e palavras reservadas\n");
         textArea.append("• Números inteiros e reais\n");
@@ -378,6 +413,11 @@ public class FileSenderApp extends JFrame {
             // Perform lexical analysis
             LexerService lexerService = new LexerService(source);
             List<TokenModel> tokens = lexerService.tokenize();
+            SymbolTableService symbolTableService = lexerService.getSymbolTable();
+
+            // Store results for saving
+            lastTokens = tokens;
+            lastSymbolTable = symbolTableService;
 
             // Display results
             displayAnalysisResults(tokens, lines.size());
@@ -387,48 +427,132 @@ public class FileSenderApp extends JFrame {
             analysisStatusLabel.setText("Status: Erro durante análise");
 
             analysisStatusLabel.setForeground(new Color(231, 76, 60));
+            clearAnalysisResults();
         }
     }
 
     private void displayAnalysisResults(List<TokenModel> tokens, int totalLines) {
-        textArea.append("=".repeat(80) + "\n");
+        StringBuilder content = new StringBuilder();
 
-        textArea.append("RESULTADO DA ANÁLISE LÉXICA\n");
-        textArea.append("=".repeat(80) + "\n\n");
 
-        textArea.append("Arquivo analisado: " + selectedFile.getName() + "\n");
-        textArea.append("Linhas processadas: " + totalLines + "\n");
-        textArea.append("Tokens encontrados: " + tokens.size() + "\n");
-        textArea.append("Análise concluída em: " + java.time.LocalDateTime.now().format(
-                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n\n");
+        content.append("=".repeat(80)).append("\n");
+        content.append("RESULTADO DA ANÁLISE LÉXICA\n");
+        content.append("=".repeat(80)).append("\n\n");
+
+        content.append("Arquivo analisado: ").append(selectedFile.getName()).append("\n");
+        content.append("Linhas processadas: ").append(totalLines).append("\n");
+        content.append("Tokens encontrados: ").append(tokens.size()).append("\n");
+        content.append("Análise concluída em: ").append(LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))).append("\n\n");
 
         if (tokens.isEmpty()) {
-            textArea.append("Nenhum token válido foi encontrado no arquivo.\n");
-            textArea.append("Verifique se o arquivo contém código válido.\n");
+            content.append("Nenhum token válido foi encontrado no arquivo.\n");
+            content.append("Verifique se o arquivo contém código válido.\n");
         } else {
-            textArea.append("LISTA DE TOKENS RECONHECIDOS:\n");
 
-            textArea.append("-".repeat(50) + "\n");
+            content.append("LISTA DE TOKENS RECONHECIDOS:\n");
+            content.append("-".repeat(50)).append("\n");
 
-            int tokenCount = 1;
+
             for (TokenModel token : tokens) {
-                textArea.append(String.format(
-                        "%3d. %-20s | %-40s | %-10s\n",
-                        tokenCount++,
-                        token.token().getName(),
+                content.append(String.format(
+                        "%-40s |%-40s | %-10s | %-10s\n",
+                        "Índice na tabela de símbolos: \"" + token.symbolTableIndex() + "\"",
                         "Lexema: \"" + token.lexeme() + "\"",
-                        "Code: \"" + token.token().getCode() + "\""
+                        "Code: \"" + token.token().getCode() + "\" ",
+                        "Line: \"" + token.line() + "\" "
                 ));
             }
 
-            textArea.append("-".repeat(50) + "\n");
-            textArea.append("Análise léxica concluída com sucesso!\n");
+            content.append("-".repeat(50)).append("\n");
+            content.append("Análise léxica concluída com sucesso!\n");
         }
+
+        // Store content for saving
+        lastAnalysisContent = content.toString();
+
+        // Display in text area
+        textArea.setText(lastAnalysisContent);
 
         // Update status
         analysisStatusLabel.setText("Status: Análise concluída - " + tokens.size() + " tokens encontrados");
 
         analysisStatusLabel.setForeground(new Color(39, 174, 96));
+    }
+
+    private void saveAnalysisResults() {
+        if (lastTokens == null || lastSymbolTable == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Nenhuma análise foi realizada ainda.",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Choose directory to save files
+        JFileChooser dirChooser = new JFileChooser();
+        dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        dirChooser.setDialogTitle("Escolher Pasta para Salvar Arquivos");
+
+        int result = dirChooser.showSaveDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File saveDirectory = dirChooser.getSelectedFile();
+        String baseFileName = selectedFile.getName().replace(".251", "");
+
+        try {
+            // Save .lex file (lexical analysis results)
+            File lexFile = new File(saveDirectory, baseFileName + ".lex");
+            saveLexFile(lexFile);
+
+            // Save .tab file (symbol table)
+            File tabFile = new File(saveDirectory, baseFileName + ".tab");
+            saveTabFile(tabFile);
+
+            JOptionPane.showMessageDialog(this,
+                    "Arquivos salvos com sucesso:\n" +
+                            "• " + lexFile.getAbsolutePath() + "\n" +
+                            "• " + tabFile.getAbsolutePath(),
+                    "Salvamento Concluído",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Erro ao salvar arquivos:\n" + ex.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void saveLexFile(File lexFile) throws IOException {
+        try (FileWriter writer = new FileWriter(lexFile)) {
+            writer.write(lastAnalysisContent);
+        }
+    }
+
+    private void saveTabFile(File tabFile) throws IOException {
+        try (FileWriter writer = new FileWriter(tabFile)) {
+            writer.write("=".repeat(80) + "\n");
+            writer.write("TABELA DE SÍMBOLOS\n");
+            writer.write("=".repeat(80) + "\n\n");
+
+            writer.write("Arquivo fonte: " + selectedFile.getName() + "\n");
+            writer.write("Data/Hora: " + LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n");
+            writer.write("Equipe: " + TEAM_CODE + "\n\n");
+
+            writer.write("CONTEÚDO DA TABELA DE SÍMBOLOS:\n");
+            writer.write("-".repeat(60) + "\n");
+
+            // Assuming SymbolTableService has a method to get formatted output
+            // You may need to adjust this based on your actual SymbolTableService implementation
+            writer.write(lastSymbolTable.toString());
+
+            writer.write("\n" + "-".repeat(60) + "\n");
+            writer.write("Tabela de símbolos gerada com sucesso!\n");
+        }
     }
 
     public static void main(String[] args) {
